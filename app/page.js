@@ -1,13 +1,13 @@
 "use client";
 
-import WelcomeMessage from './components/WelcomeMessage'
-import VisionWrapper from './components/VisionWrapper'
-import PageFooter from './components/PageFooter'
+import WelcomeMessage from '@/app/components/WelcomeMessage'
+import VisionWrapper from '@/app/components/VisionWrapper'
+import PageFooter from '@/app/components/PageFooter'
 
 
 export default () => {
   return (
-    <div className='px-[42px] pt-[10px] mt-[0.5px]'>
+    <div className='px-[42px] pt-[21px]'>
       <WelcomeMessage />
       <VisionWrapper />
       <PageFooter />
