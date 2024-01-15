@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
 export default () => {
   return (
-    <div>Footer</div>
+    <div>SideBar</div>
   );
 };

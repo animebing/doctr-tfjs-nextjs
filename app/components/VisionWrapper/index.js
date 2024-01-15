@@ -1,12 +1,22 @@
 "use client";
 
+import SideBar from '@/app/components/SideBar'
+import AnnotationViewer from '@/app/components/AnnotationViewer'
+import WordsList from '@/app/components/WordsList';
+
 export default () => {
   return (
-    <div className="flex flex-col mb-2">
-      <div className="flex items-center gap-2 mb-5">
-        <img src="/doctr.svg" alt="logo" />
-        <h2 className="text-2xl">Welcome to the docTR by mindee live demo page</h2>
+    <div className="grid grid-cols-1 md:grid-cols-12">
+      <div className="col-span-1 md:col-span-3">
+        <SideBar />
       </div>
-    </div>
+      <div className="col-span-1 md:col-span-5">
+        <AnnotationViewer />
+      </div>
+      <div className="col-span-1 md:col-span-4">
+        <WordsList />
+      </div>
+  </div>
   );
+  
 };
