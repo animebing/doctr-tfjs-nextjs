@@ -7,7 +7,7 @@ import PageFooter from '@/app/components/PageFooter'
 
 export default () => {
   return (
-    <div className='px-[42px] pt-[21px]'>
+    <div className='flex flex-col gap-2 px-[42px] pt-[21px]'>
       <WelcomeMessage />
       <VisionWrapper />
       <PageFooter />
