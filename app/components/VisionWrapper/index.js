@@ -1,15 +1,26 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import SideBar from '@/app/components/SideBar'
 import AnnotationViewer from '@/app/components/AnnotationViewer'
 import WordsList from '@/app/components/WordsList';
-import { DET_CONFIG, RECO_CONFIG } from "@/app/common/constants";
+import { DET_CONFIG, RECO_CONFIG } from '@/app/common/constants';
+import { loadDetectionModel, loadRecognitionModel } from '@/app/utils'
 
 export default () => {
   const [detConfig, setDetConfig] = useState(DET_CONFIG.db_mobilenet_v2);
   const [recoConfig, setRecoConfig] = useState(RECO_CONFIG.crnn_vgg16_bn);
+  const recognitionModel = useRef(null);
+  const detectionModel = useRef(null);
+
+  useEffect(() => {
+    loadDetectionModel({ detectionModel, detConfig });
+  }),[detConfig];
+
+  useEffect(() => {
+    loadRecognitionModel({ recognitionModel, recoConfig });
+  }, [recoConfig]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
