@@ -14,7 +14,7 @@ export const DET_CONFIG = {
     label: "DB (MobileNet V2)",
     height: 512,
     width: 512,
-    path: "/models/db_mobilenet_v2/model.json",
+    path: "models/db_mobilenet_v2/model.json",
   },
 };
 
@@ -29,7 +29,7 @@ export const RECO_CONFIG = {
     label: "CRNN (MobileNet V2)",
     height: 32,
     width: 128,
-    path: "/models/crnn_mobilenet_v2/model.json",
+    path: "models/crnn_mobilenet_v2/model.json",
   },
 };
 
