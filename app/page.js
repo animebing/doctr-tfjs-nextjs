@@ -9,13 +9,13 @@ import PageFooter from '@/app/components/PageFooter'
 
 
 export default () => {
-  const [detLoading, setDetLoading] = useState(false);
-  const [recoLoading, setRecoLoading] = useState(false);
+  const [detLoading, setDetLoading] = useState(true);
+  const [recoLoading, setRecoLoading] = useState(true);
 
   return (
-    <>
+    <>  
       {(detLoading || recoLoading) && <ModelLoading />}
-      <div className='flex flex-col gap-2 px-[42px] pt-[21px]'>
+      <div className='flex flex-col gap-1 px-1 pt-1 lg:gap-2 lg:px-[42px] lg:pt-[21px]'>
         <WelcomeMessage />
         <VisionWrapper
           setDetLoading={setDetLoading} 

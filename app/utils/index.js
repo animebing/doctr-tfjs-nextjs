@@ -2,21 +2,24 @@
 
 import {loadGraphModel} from '@tensorflow/tfjs'
 
+function sleep(timeout) {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
+
 export const loadDetectionModel = async ({
   setDetLoading,
   detectionModel,
   detConfig,
 }) => {
-  // setDetLoading(true);
+  setDetLoading(true);
   try {
-    console.log(detConfig.path);
-    console.log('begin');
-    // detectionModel.current = await loadGraphModel(detConfig.path);
-    console.log('end');
+    detectionModel.current = await loadGraphModel(detConfig.path);
   } catch (error) {
     console.log(error);
+  } finally {
+    setDetLoading(false);
   }
-  // setDetLoading(false);
 };
 
 export const loadRecognitionModel = async ({
@@ -24,14 +27,12 @@ export const loadRecognitionModel = async ({
   recognitionModel,
   recoConfig,
 }) => {
-  // setRecoLoading(true);
+  setRecoLoading(true);
   try {
-    console.log(recoConfig.path);
-    console.log('begin');
-    // recognitionModel.current = await loadGraphModel(recoConfig.path);
-    console.log('end');
+    recognitionModel.current = await loadGraphModel(recoConfig.path);
   } catch (error) {
     console.log(error);
+  } finally {
+    setRecoLoading(false);
   }
-  // setRecoLoading(false);
 };
