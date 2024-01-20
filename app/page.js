@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 
@@ -9,17 +9,17 @@ import PageFooter from '@/app/components/PageFooter'
 
 
 export default () => {
-  const [detLoading, setDetLoading] = useState(true);
-  const [recoLoading, setRecoLoading] = useState(true);
+  const [loadingDetModel, setLoadingDetModel] = useState(true);
+  const [loadingRecoModel, setLoadingRecoModel] = useState(true);
 
   return (
     <>  
-      {(detLoading || recoLoading) && <ModelLoading />}
-      <div className='flex flex-col gap-1 px-1 pt-1 lg:gap-2 lg:px-[42px] lg:pt-[21px]'>
+      {(loadingDetModel || loadingRecoModel) && <ModelLoading />}
+      <div className='flex flex-col gap-2 px-2 pt-1 lg:px-10 lg:pt-5'>
         <WelcomeMessage />
         <VisionWrapper
-          setDetLoading={setDetLoading} 
-          setRecoLoading={setRecoLoading} 
+          setLoadingDetModel={setLoadingDetModel} 
+          setLoadingRecoModel={setLoadingRecoModel} 
         />
         <PageFooter />
       </div>
