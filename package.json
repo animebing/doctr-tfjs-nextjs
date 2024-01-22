@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@techstark/opencv-js": "^4.9.0-release.2",
     "@tensorflow/tfjs": "^3.21.0",
     "next": "14.0.4",
+    "randomcolor": "^0.6.2",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
