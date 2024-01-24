@@ -18,7 +18,8 @@
     "react-dropzone": "^14.2.3",
     "react-loader-spinner": "^6.1.6",
     "react-mindee-js": "^1.6.1",
-    "react-select": "^5.8.0"
+    "react-select": "^5.8.0",
+    "underscore": "^1.13.6"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",
