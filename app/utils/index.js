@@ -1,12 +1,5 @@
 import cv from "@techstark/opencv-js";
-
-import {
-  browser,
-  getBackend,
-  loadGraphModel,
-  scalar,
-  squeeze,
-} from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs';
 
 import randomColor from "randomcolor";
 
@@ -31,8 +24,14 @@ export const loadDetectionModel = async ({
   detConfig,
 }) => {
   setLoadingDetModel(true);
-  try {
-    detectionModel.current = await loadGraphModel(detConfig.path);
+  try 
+  {
+    detectionModel.current = await tf.loadGraphModel(detConfig.path);
+    tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', true);
+    const warmupResult = detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
+    tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', false);
+    await tf.backend().checkCompileCompletionAsync();
+    tf.dispose(warmupResult);
   } catch (error) {
     console.log(error);
   } finally {
@@ -47,7 +46,7 @@ export const loadRecognitionModel = async ({
 }) => {
   setLoadingRecoModel(true);
   try {
-    recognitionModel.current = await loadGraphModel(recoConfig.path);
+    recognitionModel.current = await tf.loadGraphModel(recoConfig.path);
   } catch (error) {
     console.log(error);
   } finally {
@@ -60,12 +59,12 @@ export const getImageTensorForDetectionModel = (
   imageObject,
   size,
 ) => {
-  let tensor = browser
+  let tensor = tf.browser
     .fromPixels(imageObject)
     .resizeNearestNeighbor(size)
     .toFloat();
-  let mean = scalar(255 * DET_MEAN);
-  let std = scalar(255 * DET_STD);
+  let mean = tf.scalar(255 * DET_MEAN);
+  let std = tf.scalar(255 * DET_STD);
   return tensor.sub(mean).div(std).expandDims();
 };
 
@@ -79,15 +78,13 @@ export const getHeatMapFromImage = async ({
   new Promise(async (resolve) => {
     heatmapContainer.width = imageObject.width;
     heatmapContainer.height = imageObject.height;
-    console.log(imageObject.width);
-    console.log(imageObject.height);
     let tensor = getImageTensorForDetectionModel(imageObject, size);
     let prediction = await detectionModel?.execute(tensor);
-    prediction = squeeze(prediction, 0);
+    prediction = tf.squeeze(prediction, 0);
     if (Array.isArray(prediction)) {
       prediction = prediction[0];
     }
-    await browser.toPixels(prediction, heatmapContainer);
+    await tf.browser.toPixels(prediction, heatmapContainer);
     resolve("detection");
   });
 
