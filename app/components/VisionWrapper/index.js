@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { setBackend } from '@tensorflow/tfjs';
 
 import AnnotationViewer from '@/app/components/AnnotationViewer'
+import ModelLoading from '@/app/components/ModelLoading'
 import SideBar from '@/app/components/SideBar'
 import WordsList from '@/app/components/WordsList';
 import { DET_CONFIG, RECO_CONFIG } from '@/app/common/constants';
@@ -17,10 +18,9 @@ import {
 } from '@/app/utils'
 
 
-export default ({
-  setLoadingDetModel,
-  setLoadingRecoModel,
-}) => {
+export default () => {
+  const [loadingDetModel, setLoadingDetModel] = useState(false);
+  const [loadingRecoModel, setLoadingRecoModel] = useState(false);
   const [detConfig, setDetConfig] = useState(DET_CONFIG.db_mobilenet_v2);
   const [recoConfig, setRecoConfig] = useState(RECO_CONFIG.crnn_vgg16_bn);
   const recognitionModel = useRef(null);
@@ -99,33 +99,36 @@ export default ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <img className='hidden' ref={imageObject} />
-      <canvas id="heatmap" className="h-[35vh] m-auto hidden" ref={heatMapContainerObject} />
+    <>
+      {(loadingDetModel || loadingRecoModel) && <ModelLoading /> }
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <img className='hidden' ref={imageObject} />
+        <canvas id="heatmap" className="h-[35vh] m-auto hidden" ref={heatMapContainerObject} />
 
-      <img className='hidden' ref={imageObjectFake} />
-      <canvas className='hidden' ref={canvasObjectFake} />
+        <img className='hidden' ref={imageObjectFake} />
+        <canvas className='hidden' ref={canvasObjectFake} />
 
-      <div className="p-2 rounded border-2 col-span-1 lg:col-span-3 lg:p-8 lg:rounded-lg">
-        <SideBar
-          detConfig={detConfig}
-          setDetConfig={setDetConfig}
-          recoConfig={recoConfig}
-          setRecoConfig={setRecoConfig}
-          loadingImage={loadingImage}
-          onUpload={onUpload}
-        />
+        <div className="p-2 rounded border-2 col-span-1 lg:col-span-3 lg:p-8 lg:rounded-lg">
+          <SideBar
+            detConfig={detConfig}
+            setDetConfig={setDetConfig}
+            recoConfig={recoConfig}
+            setRecoConfig={setRecoConfig}
+            loadingImage={loadingImage}
+            onUpload={onUpload}
+          />
+        </div>
+        <div className="p-2 rounded border-2 col-span-1 lg:col-span-5 lg:p-8 lg:rounded-lg">
+          <AnnotationViewer 
+            loadingImage={loadingImage}
+            annotationData={annotationData}
+            setAnnotationStage={setAnnotationStage}
+          />
+        </div>
+        <div className="p-2 rounded border-2 col-span-1 lg:col-span-4 lg:p-8 lg:rounded-lg">
+          <WordsList />
+        </div>
       </div>
-      <div className="p-2 rounded border-2 col-span-1 lg:col-span-5 lg:p-8 lg:rounded-lg">
-        <AnnotationViewer 
-          loadingImage={loadingImage}
-          annotationData={annotationData}
-          setAnnotationStage={setAnnotationStage}
-        />
-      </div>
-      <div className="p-2 rounded border-2 col-span-1 lg:col-span-4 lg:p-8 lg:rounded-lg">
-        <WordsList />
-      </div>
-  </div>
+    </>
   );
 };
