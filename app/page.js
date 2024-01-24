@@ -1,28 +1,25 @@
-'use client';
+import { headers } from 'next/headers'
 
-import { useState } from 'react';
-
-import ModelLoading from '@/app/components/ModelLoading'
 import WelcomeMessage from '@/app/components/WelcomeMessage'
 import VisionWrapper from '@/app/components/VisionWrapper'
 import PageFooter from '@/app/components/PageFooter'
 
 
 export default () => {
-  const [loadingDetModel, setLoadingDetModel] = useState(true);
-  const [loadingRecoModel, setLoadingRecoModel] = useState(true);
-
+  const userAgent =  headers().get('user-agent');
+  const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  const isMobile = regex.test(userAgent);
   return (
-    <>  
-      {(loadingDetModel || loadingRecoModel) && <ModelLoading />}
+    isMobile ? (
+      <div>
+        hello world mobile
+      </div>
+    ) : (
       <div className='flex flex-col gap-2 px-2 pt-1 lg:px-10 lg:pt-5'>
         <WelcomeMessage />
-        <VisionWrapper
-          setLoadingDetModel={setLoadingDetModel} 
-          setLoadingRecoModel={setLoadingRecoModel} 
-        />
+        <VisionWrapper />
         <PageFooter />
       </div>
-    </>
+    )
   );
 };
