@@ -55,7 +55,7 @@ export const loadRecognitionModel = async ({
   setLoadingRecoModel(true);
   try {
     recognitionModel.current = await tf.loadGraphModel(recoConfig.path);
-    let warmupResult = await recognitionModel.current.executeAsync(tf.zeros([32, recoConfig.height, recoConfig.width, 3]));
+    let warmupResult = await recognitionModel.current.executeAsync(tf.zeros([16, recoConfig.height, recoConfig.width, 3]));
     tf.dispose(warmupResult);
   } catch (error) {
     console.log(error);
@@ -165,7 +165,7 @@ export const extractWords = async ({
   size,
 }) => {
   const crops = (await getCrops({ stage }));
-  const chunks = chunk(crops, 32);
+  const chunks = chunk(crops, 16);
   return Promise.all(
     chunks.map(
       (chunk) =>
