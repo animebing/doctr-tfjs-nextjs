@@ -1,20 +1,21 @@
 'use client';
 
+import { flatten } from "underscore";
 import { useEffect, useRef, useState } from 'react';
-import { setBackend } from '@tensorflow/tfjs';
 
 import AnnotationViewer from '@/app/components/AnnotationViewer'
 import ModelLoading from '@/app/components/ModelLoading'
 import SideBar from '@/app/components/SideBar'
 import WordsList from '@/app/components/WordsList';
 import { DET_CONFIG, RECO_CONFIG } from '@/app/common/constants';
+import { useStateWithRef } from "@/app/utils/hooks";
 import {
   extractBoundingBoxesFromHeatmap,
+  extractWords,
   getHeatMapFromImage,
   loadDetectionModel,
   loadRecognitionModel,
   sleep,
-  isMobile,
 } from '@/app/utils'
 
 
@@ -36,22 +37,46 @@ export default () => {
     image: null,
   });
 
-  useEffect(() => {
-    if (isMobile()) {
-      setBackend('cpu');
-    }
-  }, []);
+  const [extractingWords, setExtractingWords] = useState(false);
+  const [words, setWords, wordsRef] = useStateWithRef([]);
+  const fieldRefsObject = useRef([]);
 
   useEffect(() => {
+    setWords([]);
+    setAnnotationData({ image: null });
+    imageObject.current.src = "";
+    if (heatMapContainerObject.current) {
+      const context = heatMapContainerObject.current.getContext("2d");
+      context.clearRect(
+        0,
+        0,
+        heatMapContainerObject.current.width,
+        heatMapContainerObject.current.height
+      );
+    }
     loadDetectionModel({setLoadingDetModel, detectionModel, detConfig});
   }, [setLoadingDetModel, detConfig]);
 
   useEffect(() => {
+    setWords([]);
+    setAnnotationData({ image: null });
+    imageObject.current.src = "";
+    if (heatMapContainerObject.current) {
+      const context = heatMapContainerObject.current.getContext("2d");
+      context.clearRect(
+        0,
+        0,
+        heatMapContainerObject.current.width,
+        heatMapContainerObject.current.height
+      );
+    }
     loadRecognitionModel({setLoadingRecoModel, recognitionModel, recoConfig});
   }, [setLoadingRecoModel, recoConfig]);
 
   const onUpload = async (uploadedFile) => {
+    setWords([]);
     setLoadingImage(true);
+    setExtractingWords(true);
     imageObjectFake.current.onload = async () => {
       await getHeatMapFromImage({
         heatmapContainer: heatMapContainerObject.current,
@@ -62,8 +87,9 @@ export default () => {
       getBoundingBoxes();
       imageObjectFake.current.url = null;
       let ctx = canvasObjectFake.current.getContext('2d');
-      ctx?.clearRect(0, 0, canvasObjectFake.current.width, canvasObjectFake.current.height);
+      ctx.clearRect(0, 0, canvasObjectFake.current.width, canvasObjectFake.current.height);
       setLoadingImage(false);
+      toGetWords();
     };
     imageObject.current.onload = async () => {
       let shortSide = Math.min(imageObject.current.width, imageObject.current.height);
@@ -92,6 +118,24 @@ export default () => {
       image: imageObject.current.src,
       shapes: boundingBoxes,
     });
+  }
+
+  const toGetWords = async () => {
+    while (typeof annotationStage.current === 'undefined') {
+      await sleep(1000);
+    }
+    getWords();
+  };
+
+  const getWords = async () => {
+    const words = (await extractWords({
+      recognitionModel: recognitionModel.current,
+      stage: annotationStage.current,
+      size: [recoConfig.height, recoConfig.width],
+    }));
+    console.log(words);
+    setWords(flatten(words));
+    setExtractingWords(false);
   };
 
   const setAnnotationStage = (stage) => {
