@@ -133,7 +133,7 @@ export default () => {
       stage: annotationStage.current,
       size: [recoConfig.height, recoConfig.width],
     }));
-    console.log(words);
+    // TODO: sometimes words = [], i do not figure it now
     setWords(flatten(words));
     setExtractingWords(false);
   };
