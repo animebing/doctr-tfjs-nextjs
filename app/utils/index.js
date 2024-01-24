@@ -1,9 +1,15 @@
+import { chunk } from 'underscore';
 import cv from "@techstark/opencv-js";
+import randomColor from "randomcolor";
 import * as tf from '@tensorflow/tfjs';
 
-import randomColor from "randomcolor";
-
-import { DET_MEAN, DET_STD } from '@/app/common/constants';
+import {
+  DET_MEAN,
+  DET_STD,
+  REC_MEAN,
+  REC_STD,
+  VOCAB,
+ } from '@/app/common/constants';
 
 export function sleep(timeout) {
   return new Promise(resolve => setTimeout(resolve, timeout));
@@ -27,10 +33,12 @@ export const loadDetectionModel = async ({
   try 
   {
     detectionModel.current = await tf.loadGraphModel(detConfig.path);
-    tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', true);
-    const warmupResult = detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
-    tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', false);
-    await tf.backend().checkCompileCompletionAsync();
+    // tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', true);
+    // let warmupResult = detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
+    // tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', false);
+    // await tf.backend().checkCompileCompletionAsync();
+    // tf.dispose(warmupResult);
+    let warmupResult = await detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
     tf.dispose(warmupResult);
   } catch (error) {
     console.log(error);
@@ -47,6 +55,8 @@ export const loadRecognitionModel = async ({
   setLoadingRecoModel(true);
   try {
     recognitionModel.current = await tf.loadGraphModel(recoConfig.path);
+    let warmupResult = await recognitionModel.current.executeAsync(tf.zeros([32, recoConfig.height, recoConfig.width, 3]));
+    tf.dispose(warmupResult);
   } catch (error) {
     console.log(error);
   } finally {
@@ -148,3 +158,121 @@ export const transformBoundingBox = (
 function clamp(number, size) {
   return Math.max(0, Math.min(number, size));
 }
+
+export const extractWords = async ({
+  recognitionModel,
+  stage,
+  size,
+}) => {
+  const crops = (await getCrops({ stage }));
+  const chunks = chunk(crops, 32);
+  return Promise.all(
+    chunks.map(
+      (chunk) =>
+        new Promise(async (resolve) => {
+          const words = await extractWordsFromCrop({
+            recognitionModel,
+            crops: chunk.map((elem) => elem.crop),
+            size,
+          });
+          const collection = words?.map((word, index) => ({
+            ...chunk[index],
+            words: word ? [word] : [],
+          }));
+          resolve(collection);
+        })
+    )
+  );
+};
+
+export const getCrops = ({ stage }) => {
+  const layer = stage.findOne("#shapes-layer");
+  const polygons = layer.find(".shape");
+  return Promise.all(
+    polygons.map((polygon) => {
+      const clientRect = polygon.getClientRect();
+      return new Promise((resolve) => {
+        stage.toImage({
+          ...clientRect,
+          quality: 5,
+          pixelRatio: 10,
+          callback: (value) => {
+            resolve({
+              id: polygon.id(),
+              crop: value,
+              color: polygon.getAttr("stroke"),
+            });
+          },
+        });
+      });
+    })
+  );
+};
+
+export const extractWordsFromCrop = async ({
+  recognitionModel,
+  crops,
+  size,
+}) => {
+  let tensor = getImageTensorForRecognitionModel(crops, size);
+  let predictions = await recognitionModel.executeAsync(tensor);
+
+  let probabilities = tf.softmax(predictions, -1);
+  let bestPath = tf.unstack(tf.argMax(probabilities, -1), 0);
+  let blank = 126;
+  var words = [];
+  for (const sequence of bestPath) {
+    let collapsed = "";
+    let added = false;
+    const values = sequence.dataSync();
+    const arr = Array.from(values);
+    for (const k of arr) {
+      if (k === blank) {
+        added = false;
+      } else if (k !== blank && added === false) {
+        collapsed += VOCAB[k];
+        added = true;
+      }
+    }
+    words.push(collapsed);
+  }
+  return words;
+};
+
+export const getImageTensorForRecognitionModel = (
+  crops,
+  size,
+) => {
+  const list = crops.map((imageObject) => {
+    let h = imageObject.height;
+    let w = imageObject.width;
+    let resize_target;
+    let padding_target;
+    let aspect_ratio = size[1] / size[0];
+    if (aspect_ratio * h > w) {
+      resize_target = [size[0], Math.round((size[0] * w) / h)];
+      padding_target = [
+        [0, 0],
+        [0, size[1] - Math.round((size[0] * w) / h)],
+        [0, 0],
+      ];
+    } else {
+      resize_target = [Math.round((size[1] * h) / w), size[1]];
+      padding_target = [
+        [0, size[0] - Math.round((size[1] * h) / w)],
+        [0, 0],
+        [0, 0],
+      ];
+    }
+    return tf.browser
+      .fromPixels(imageObject)
+      .resizeNearestNeighbor(resize_target)
+      .pad(padding_target, 0)
+      .toFloat()
+      .expandDims();
+  });
+  const tensor = tf.concat(list);
+  let mean = tf.scalar(255 * REC_MEAN);
+  let std = tf.scalar(255 * REC_STD);
+  return tensor.sub(mean).div(std);
+};
