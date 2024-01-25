@@ -1,7 +1,5 @@
-"use client";
-
 export default () => {
   return (
-    <div>Footer</div>
+    <div>hello world</div>
   );
 };
