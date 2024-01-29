@@ -12,6 +12,9 @@ export default ({
   loadingImage,
   annotationData,
   setAnnotationStage,
+  onShapeMouseEnter,
+  onShapeMouseLeave,
+  onShapeClick,
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -40,6 +43,9 @@ export default ({
           <AnnotationViewerBase
             data={annotationData}
             getStage={setAnnotationStage}
+            onShapeMouseEnter={onShapeMouseEnter}
+            onShapeMouseLeave={onShapeMouseLeave}
+            onShapeClick={onShapeClick}
             style={{ height: "435px", width: "95%", background: "white" }}
           />
         </div>
