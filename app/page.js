@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 
+import MobileWelcomeMessage from '@/app/components/MobileWelcomeMessage';
 import WelcomeMessage from '@/app/components/WelcomeMessage'
 import VisionWrapper from '@/app/components/VisionWrapper'
 
@@ -10,7 +11,7 @@ export default () => {
   const isMobile = regex.test(userAgent);
   return (
     isMobile ? (
-      <></>
+      <MobileWelcomeMessage />
     ) : (
       <div className='flex flex-col gap-2 px-2 pt-1 lg:px-10 lg:pt-5'>
         <WelcomeMessage />
