@@ -1,7 +1,7 @@
 'use client';
 
 import { flatten } from "underscore";
-import { useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 
 import AnnotationViewer from '@/app/components/AnnotationViewer'
 import ModelLoading from '@/app/components/ModelLoading'
@@ -55,7 +55,7 @@ export default () => {
       );
     }
     loadDetectionModel({setLoadingDetModel, detectionModel, detConfig});
-  }, [setLoadingDetModel, detConfig]);
+  }, [detConfig]);
 
   useEffect(() => {
     setWords([]);
@@ -71,7 +71,7 @@ export default () => {
       );
     }
     loadRecognitionModel({setLoadingRecoModel, recognitionModel, recoConfig});
-  }, [setLoadingRecoModel, recoConfig]);
+  }, [recoConfig]);
 
   const onUpload = async (uploadedFile) => {
     setWords([]);
@@ -89,7 +89,8 @@ export default () => {
       let ctx = canvasObjectFake.current.getContext('2d');
       ctx.clearRect(0, 0, canvasObjectFake.current.width, canvasObjectFake.current.height);
       setLoadingImage(false);
-      toGetWords();
+      // show box image first
+      setTimeout(toGetWords, 1000);
     };
     imageObject.current.onload = async () => {
       let shortSide = Math.min(imageObject.current.width, imageObject.current.height);
@@ -137,6 +138,37 @@ export default () => {
     setWords(flatten(words));
     setExtractingWords(false);
   };
+  fieldRefsObject.current = useMemo(
+    () => words.map((word) => createRef()),
+    [words],
+  );
+
+  const onShapeMouseEnter = (shape) => {
+    const newWords = [...wordsRef.current];
+    const fieldIdx = newWords.findIndex((word) => word.id === shape.id);
+    if (fieldIdx >= 0) {
+      newWords[fieldIdx].isActive = true;
+      setWords(newWords);
+    }
+  };
+  const onShapeMouseLeave = (shape) => {
+    const newWords = [...wordsRef.current];
+    const fieldIdx = newWords.findIndex((word) => word.id === shape.id);
+    if (fieldIdx >= 0) {
+      newWords[fieldIdx].isActive = false;
+      setWords(newWords);
+    }
+  };
+  const onShapeClick = (shape) => {
+    const fieldIdx = wordsRef.current.findIndex((word) => (word.id === shape.id));
+
+    if (fieldIdx >= 0) {
+      fieldRefsObject.current[fieldIdx].current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
 
   const setAnnotationStage = (stage) => {
     annotationStage.current = stage;
@@ -167,10 +199,17 @@ export default () => {
             loadingImage={loadingImage}
             annotationData={annotationData}
             setAnnotationStage={setAnnotationStage}
+            onShapeMouseEnter={onShapeMouseEnter}
+            onShapeMouseLeave={onShapeMouseLeave}
+            onShapeClick={onShapeClick}
           />
         </div>
         <div className="p-2 rounded border-2 col-span-1 lg:col-span-4 lg:p-8 lg:rounded-lg">
-          <WordsList />
+          <WordsList
+            fieldRefsObject={fieldRefsObject.current}
+            extractingWords={extractingWords}
+            words={words}
+          />
         </div>
       </div>
     </>
