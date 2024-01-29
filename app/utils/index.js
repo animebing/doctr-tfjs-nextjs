@@ -33,11 +33,6 @@ export const loadDetectionModel = async ({
   try 
   {
     detectionModel.current = await tf.loadGraphModel(detConfig.path);
-    // tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', true);
-    // let warmupResult = detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
-    // tf.env().set('WEBGPU_ENGINE_COMPILE_ONLY', false);
-    // await tf.backend().checkCompileCompletionAsync();
-    // tf.dispose(warmupResult);
     let warmupResult = await detectionModel.current.execute(tf.zeros([1, detConfig.height, detConfig.width, 3]));
     tf.dispose(warmupResult);
   } catch (error) {
