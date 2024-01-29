@@ -1,8 +1,9 @@
 import { headers } from 'next/headers'
 
 import MobileWelcomeMessage from '@/app/components/MobileWelcomeMessage';
+import PageHeader from '@/app/components/PageHeader';
+import VisionWrapper from '@/app/components/VisionWrapper';
 import WelcomeMessage from '@/app/components/WelcomeMessage'
-import VisionWrapper from '@/app/components/VisionWrapper'
 
 
 export default () => {
@@ -13,9 +14,12 @@ export default () => {
     isMobile ? (
       <MobileWelcomeMessage />
     ) : (
-      <div className='flex flex-col gap-2 px-2 pt-1 lg:px-10 lg:pt-5'>
-        <WelcomeMessage />
-        <VisionWrapper />
+      <div className='flex flex-col'>
+        <PageHeader />
+        <div className='flex flex-col gap-2 px-4 pt-2 md:px-10 md:pt-5'>
+          <WelcomeMessage />
+          <VisionWrapper />
+        </div>
       </div>
     )
   );
