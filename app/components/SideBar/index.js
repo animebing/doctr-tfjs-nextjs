@@ -16,28 +16,28 @@ export default ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-base lg:text-lg font-medium mb-2">
+      <div className="text-base md:text-lg font-medium mb-2">
         1 - Select a Model
       </div>
       <div className="flex flex-col gap-1 mb-1">
-        <p className="text-sm lg:text-base">Detection model</p>
+        <p className="text-sm md:text-base">Detection model</p>
         <Select
-          className='text-xs lg:text-sm'
+          className='text-xs md:text-sm'
           defaultValue={detConfig}
           onChange={setDetConfig}
           options={Object.values(DET_CONFIG)}
         />
       </div>
       <div className="flex flex-col gap-1 mb-1">
-        <p className="text-sm lg:text-base">Recognition model</p>
+        <p className="text-sm md:text-base">Recognition model</p>
         <Select
-          className='text-xs lg:text-sm'
+          className='text-xs md:text-sm'
           defaultValue={recoConfig}
           onChange={setRecoConfig}
           options={Object.values(RECO_CONFIG)}
         />
       </div>
-      <div className="text-base lg:text-lg mb-3 mt-3">
+      <div className="text-base md:text-lg mb-3 mt-3">
         2 - Upload an image
       </div>
 
@@ -55,7 +55,7 @@ export default ({
           ) : (
             <>
               <img src="/image-placeholder.svg" alt="placeholder" className='h-[100px] rounded-lg object-contain cursor-pointer'/>
-              <div className='text-xs lg:text-sm text-center'>
+              <div className='text-xs md:text-sm text-center'>
                 Upload an image <br />
                 (.jpg, .png, .webp)
               </div>

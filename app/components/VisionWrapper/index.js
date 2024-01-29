@@ -177,14 +177,14 @@ export default () => {
   return (
     <>
       {(loadingDetModel || loadingRecoModel) && <ModelLoading /> }
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         <img className='hidden' ref={imageObject} />
         <canvas id="heatmap" className="h-[35vh] m-auto hidden" ref={heatMapContainerObject} />
 
         <img className='hidden' ref={imageObjectFake} />
         <canvas className='hidden' ref={canvasObjectFake} />
 
-        <div className="p-2 rounded border-2 col-span-1 lg:col-span-3 lg:p-8 lg:rounded-lg">
+        <div className="p-2 rounded border-2 col-span-1 md:col-span-3 md:p-8 md:rounded-lg">
           <SideBar
             detConfig={detConfig}
             setDetConfig={setDetConfig}
@@ -194,7 +194,7 @@ export default () => {
             onUpload={onUpload}
           />
         </div>
-        <div className="p-2 rounded border-2 col-span-1 lg:col-span-5 lg:p-8 lg:rounded-lg">
+        <div className="p-2 rounded border-2 col-span-1 md:col-span-5 md:p-8 md:rounded-lg">
           <AnnotationViewer 
             loadingImage={loadingImage}
             annotationData={annotationData}
@@ -204,7 +204,7 @@ export default () => {
             onShapeClick={onShapeClick}
           />
         </div>
-        <div className="p-2 rounded border-2 col-span-1 lg:col-span-4 lg:p-8 lg:rounded-lg">
+        <div className="p-2 rounded border-2 col-span-1 md:col-span-4 md:p-8 md:rounded-lg">
           <WordsList
             fieldRefsObject={fieldRefsObject.current}
             extractingWords={extractingWords}
