@@ -41,5 +41,5 @@ npm run dev
 - [ ] do inference usinng paddleocr model
 - [ ] do inference using web worker
 
-# Credit to
+## Credit to
 - [doctr-tfjs-demo](https://github.com/mindee/doctr-tfjs-demo/tree/master)
